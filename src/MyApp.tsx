@@ -1,15 +1,10 @@
-import {App, Block, Button} from "konsta/react";
+import {App} from "konsta/react";
+import LoginPage from "./pages/LoginPage.tsx";
 
 function MyApp() {
   return (
       <App theme="ios" className="k-ios" dark>
-        <Block>
-          <p>Um pequeno bloquinho</p>
-        </Block>
-        <Block className="space-y-4">
-          <p>Aqui vem o botão</p>
-          <Button>Ação</Button>
-        </Block>
+          <LoginPage />
       </App>
   )
 }

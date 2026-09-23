@@ -7,6 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   plugins: [react(), tailwindcss(), VitePWA({
     registerType: 'autoUpdate',
+    includeAssets: ['Logo-dark-512x512.png', 'Logo-light-512x512.png'],
     manifest: {
       name: 'Task App PWA',
       short_name: 'TaskApp',
