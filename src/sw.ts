@@ -27,7 +27,7 @@ interface Task {
     description: string;
     status: 'pending' | 'completed';
     synced?: boolean;
-};
+}
 
 class TriDoDatabase extends Dexie {
     tasks!: Table<Task>;
