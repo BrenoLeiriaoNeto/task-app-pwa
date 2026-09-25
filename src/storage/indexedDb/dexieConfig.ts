@@ -4,14 +4,18 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    password: string;
+    password?: string;
+    updated_at: string;
 }
 
 export interface Task {
     id: string;
     title: string;
     description: string;
-    status: 'pending' | 'completed';
+    status: 'pending' | 'completed' | 'deleted';
+    userId: string;
+    synced: boolean;
+    updated_at: string;
 }
 
 export class TriDoDatabase extends Dexie {
@@ -21,9 +25,9 @@ export class TriDoDatabase extends Dexie {
     constructor() {
         super('TriDoLocalDB');
 
-        this.version(1).stores({
-            users: 'id, &email',
-            tasks: 'id, status'
+        this.version(2).stores({
+            users: 'id, &email, updated_at',
+            tasks: 'id, status, userId, synced, updated_at'
         });
     }
 }

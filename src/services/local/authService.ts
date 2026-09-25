@@ -1,20 +1,28 @@
-import { localDb, type User } from "../storage/indexedDb/dexieConfig.ts";
+import { localDb, type User } from "../../storage/indexedDb/dexieConfig.ts";
 
 export const registerUser = async (
+    id: string,
     name: string,
     email: string,
-    password: string
-): Promise<User> => {
+): Promise<void> => {
     const newUser: User = {
-        id: crypto.randomUUID(),
+        id: id,
         name,
         email: email.toLowerCase(),
-        password
+        updated_at: new Date().toISOString(),
     };
 
     await localDb.users.add(newUser);
 
-    return newUser;
+}
+
+export const updateUser = async (
+    id: string,
+    name: string,
+    email: string,
+    updated_at: string
+): Promise<void> => {
+
 }
 
 export const loginUser = async (
