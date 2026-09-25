@@ -1,40 +1,53 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {triggerBackgroundSync} from "../utils/syncUtils.ts";
 import {pullSyncFromFirestore} from "../services/syncService.ts";
 
 export function useNetworkSync(userId?: string) {
-    const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState<boolean>(
+      typeof navigator !== 'undefined' ? navigator.onLine : true
+    );
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
 
-    useEffect(() => {
-        const runSyncProcess = async () => {
-            try {
-                await triggerBackgroundSync();
+  const runSyncProcess = useCallback(async () => {
+    if (!navigator.onLine) return;
 
-                if (userId)
-                    await pullSyncFromFirestore(userId);
-            } catch (error) {
-                console.error('Erro durante o processo de sincronização:', error);
-            }
-        };
+    setIsSyncing(true);
 
-        const handleOnline = () => {
-            setIsOnline(true);
+    try {
+      await triggerBackgroundSync();
 
-            runSyncProcess();
-        };
+      if (userId) {
+        await pullSyncFromFirestore(userId);
+      }
+    } catch (error) {
+      console.error('[useNetworkAsync] Erro durante o processo de sincronização:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [userId]);
 
-        const handleOffline = () => {
-            setIsOnline(false);
-        };
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      runSyncProcess();
+    };
 
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
 
-        return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
-        };
-    }, [userId]);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
-    return { isOnline };
+    if (navigator.onLine) {
+      runSyncProcess();
+    }
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    }
+  }, [runSyncProcess])
+
+    return { isOnline, isSyncing, syncNow: runSyncProcess };
 }

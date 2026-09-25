@@ -1,11 +1,17 @@
 /// <reference lib="webworker" />
-import { precacheAndRoute } from 'workbox-precaching';
+import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { localDb } from "./storage/indexedDb/dexieConfig.ts";
 
 declare let self: ServiceWorkerGlobalScope;
 
+interface SyncEvent extends ExtendableEvent {
+  readonly tag: string;
+  readonly lastChance: boolean;
+}
+
+cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
 
 const firebaseConfig = {
@@ -21,7 +27,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
 
-async function syncTasksWithFirestore() {
+async function syncTasksWithFirestore(): Promise<void> {
     try {
         const pendingTasks = await localDb.tasks
             .filter(t => !t.synced)
@@ -39,14 +45,23 @@ async function syncTasksWithFirestore() {
     }
 }
 
-self.addEventListener('sync', (event: any) => {
-    if (event.tag === 'sync-tasks') {
+self.addEventListener('sync', (event: Event) => {
+  const syncEvent = event as SyncEvent;
+  if (syncEvent.tag === 'sync-tasks') {
+    syncEvent.waitUntil(syncTasksWithFirestore());
+  }
+});
+
+self.addEventListener('message', (event: ExtendableMessageEvent) => {
+    if (event.data && event.data.type === 'SYNC_TASKS') {
         event.waitUntil(syncTasksWithFirestore());
     }
 });
 
-self.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'SYNC_TASKS') {
-        event.waitUntil(syncTasksWithFirestore());
-    }
+self.addEventListener('install', () => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event: ExtendableEvent) => {
+  event.waitUntil(self.clients.claim());
 });

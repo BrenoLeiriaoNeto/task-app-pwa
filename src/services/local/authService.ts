@@ -16,15 +16,6 @@ export const registerUser = async (
 
 }
 
-export const updateUser = async (
-    id: string,
-    name: string,
-    email: string,
-    updated_at: string
-): Promise<void> => {
-
-}
-
 export const loginUser = async (
     email: string,
     password: string

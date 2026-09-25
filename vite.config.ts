@@ -10,19 +10,31 @@ export default defineConfig({
     srcDir: 'src',
     filename: 'sw.ts',
     registerType: 'autoUpdate',
-    includeAssets: ['Logo-dark-512x512.png', 'Logo-light-512x512.png'],
+    injectRegister: 'auto',
     manifest: {
       name: 'Task App PWA',
       short_name: 'TaskApp',
       description: 'A simple task app with PWA capabilities',
 
-      theme_color: '#364153',
-      background_color: '#364153',
+      theme_color: '#10b981',
+      background_color: '#18181b',
 
       display: 'standalone',
       orientation: 'portrait',
-      scope: '/',
-      start_url: '/'
+      icons: [
+        {
+          src: '/public/Logo-dark-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable'
+        },
+        {
+          src: '/public/Logo-light-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable'
+        }
+      ]
     }
   })],
 })
