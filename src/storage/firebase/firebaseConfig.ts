@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics, type Analytics, isSupported, logEvent } from "firebase/analytics";
 import { initializeFirestore, memoryLocalCache } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAaHbMb-buqa48fwqJmjr18QegYAp31O4c",
@@ -16,6 +17,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = initializeFirestore(firebaseApp, {
     localCache: memoryLocalCache()
 });
+const auth = getAuth(firebaseApp);
 
 let analytics: Analytics | null = null;
 
@@ -33,4 +35,4 @@ export const trackEvent = (eventName: string, eventParams?: Record<string, any>)
     }
 }
 
-export { firebaseApp, analytics, db };
+export { firebaseApp, analytics, db, auth };

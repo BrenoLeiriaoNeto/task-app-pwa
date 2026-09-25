@@ -2,7 +2,7 @@
 import { precacheAndRoute } from 'workbox-precaching';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import Dexie, { type Table } from 'dexie';
+import { localDb } from "./storage/indexedDb/dexieConfig.ts";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -21,42 +21,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
 
-interface Task {
-    id: string;
-    title: string;
-    description: string;
-    status: 'pending' | 'completed';
-    synced?: boolean;
-}
-
-class TriDoDatabase extends Dexie {
-    tasks!: Table<Task>;
-    constructor() {
-        super('TriDoLocalDB');
-        this.version(1).stores({ tasks: 'id, status, synced' });
-    }
-}
-
-const localDb = new TriDoDatabase();
-
 async function syncTasksWithFirestore() {
     try {
         const pendingTasks = await localDb.tasks
-            .filter(t => t.synced === false)
+            .filter(t => !t.synced)
             .toArray();
 
         for (const task of pendingTasks) {
-            await setDoc(doc(firestore, "tasks", task.id), {
-                title: task.title,
-                description: task.description,
-                status: task.status,
-                updatedAt: new Date().toISOString()
-            });
+            const { synced, ...cloudTaskData } = task;
+
+            await setDoc(doc(firestore, "tasks", task.id), cloudTaskData, {merge: true});
 
             await localDb.tasks.update(task.id, { synced: true });
         }
     } catch (error) {
-        console.error('[SW background Sync Failed]:', error);
+        console.error('[SW background Sync falhou]:', error);
     }
 }
 
