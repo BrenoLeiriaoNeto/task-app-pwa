@@ -14,7 +14,7 @@ export const LoginPage = ({ onLoginSuccess }: LoginPageProps) => {
         <div className="flex flex-col items-center justify-center mb-6 text-center">
           <div className="relative mb-3">
             <img
-              src="/Logo-dark-512x512.png"
+              src="/Logo-dark-512px.png"
               alt="Application Logo"
               className="w-72 h-72 object-contain rounded-2xl shadow-2xl drop-shadow-lg ring-1 ring-white/10"
               width="512"
