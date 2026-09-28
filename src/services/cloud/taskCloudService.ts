@@ -1,16 +1,33 @@
-import { doc, setDoc, deleteDoc } from 'firebase/firestore';
-import type {Task} from "../../storage/indexedDb/dexieConfig.ts";
+import {doc, setDoc, query, collection, where, getDocs} from 'firebase/firestore';
+import {type Task, TaskStatus} from "../../storage/indexedDb/dexieConfig.ts";
 import {db} from "../../storage/firebase/firebaseConfig.ts";
 
-export const upsertCloudTask = async (task: Task) => {
-    const taskRef = doc(db, "tasks", task.id);
+export const taskCloudService = {
 
-    const { synced, ...cloudTaskData } = task;
+    async pushTaskToCloud(task: Task): Promise<void> {
+        const { synced, ...cloudTaskData } = task;
 
-    await setDoc(taskRef, cloudTaskData, { merge: true });
-};
+        await setDoc(doc(db, "tasks", task.id), cloudTaskData, { merge: true });
+    },
 
-export const deleteCloudTask = async (taskId: string) => {
-    const taskRef = doc(db, "tasks", taskId);
-    await deleteDoc(taskRef);
+    async pullTasksFromCloud(userId: string): Promise<Task[]> {
+        const q = query(collection(
+            db, "tasks"), where("userId", "==", userId)
+        );
+        const snapshot = await getDocs(q);
+
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                title: data.title,
+                description: data.description,
+                status: data.staus || TaskStatus.PENDING,
+                userId: data.userId,
+                created_at: data.created_at,
+                updated_at: data.updated_at,
+                synced: true
+            } as Task;
+        })
+    }
 }

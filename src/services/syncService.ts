@@ -1,49 +1,35 @@
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
-import {localDb, type Task} from "../storage/indexedDb/dexieConfig.ts";
-import {db} from "../storage/firebase/firebaseConfig.ts";
+import {localDb} from "../storage/indexedDb/dexieConfig.ts";
+import {taskCloudService} from "./cloud/taskCloudService.ts";
+import {logTasksPullSynced, logTasksPushSynced} from "../storage/firebase/analyticsService.ts";
 
-export const pullSyncFromFirestore = async (userId: string) => {
-    try {
-        const lastLocalTask = await localDb.tasks
-            .orderBy('updated_at')
-            .reverse()
-            .first();
+export const pushSyncToFirestore = async (): Promise<void> => {
+    const pendingTasks = await localDb.tasks.filter(
+        t => !t.synced
+    ).toArray();
 
-        const lastSyncTime = lastLocalTask ? lastLocalTask.updated_at : 0;
+    if (pendingTasks.length === 0) return;
 
-        const tasksRef = collection(db, 'tasks');
-        const q = query(
-            tasksRef,
-            where('userId', '==', userId),
-            where('updated_at', '>', lastSyncTime),
-            orderBy('updated_at', 'asc')
-        );
-
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            console.log('✅ Tudo atualizado! Nenhuma nova alteração no Firestore.');
-            return;
+    for (const task of pendingTasks) {
+        try {
+            await taskCloudService.pushTaskToCloud(task);
+            await localDb.tasks.update(task.id, {synced: true});
+        } catch (error) {
+            console.error(`Falha ao realizar o Push Sync da tarefa ${task.id}:`, error);
         }
+    }
+    logTasksPushSynced(pendingTasks.length);
+}
 
-        const tasksToUpdate: Task[] = [];
+export const pullSyncFromFirestore = async (userId: string): Promise<void> => {
+    try {
+        const cloudTasks = await taskCloudService.pullTasksFromCloud(userId);
 
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            tasksToUpdate.push({
-                id: doc.id,
-                title: data.title,
-                description: data.description,
-                status: data.status,
-                userId: data.userId,
-                updated_at: data.updated_at,
-                synced: true
-            });
-        });
+        if (cloudTasks.length === 0) return;
 
-        await localDb.tasks.bulkPut(tasksToUpdate);
+        await localDb.tasks.bulkPut(cloudTasks);
 
-        console.log(`🔄 Pull Sync concluído: ${tasksToUpdate.length} tarefas atualizadas.`);
+        logTasksPullSynced(cloudTasks.length);
+
     } catch (error) {
         console.error('❌ Erro ao realizar o Pull Sync:', error);
     }

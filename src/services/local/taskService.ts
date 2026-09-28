@@ -1,45 +1,52 @@
-import {localDb, type Task} from "../../storage/indexedDb/dexieConfig.ts";
-import {logTaskCreated, logTaskUpdated} from "../../storage/firebase/analyticsService.ts";
-import {upsertCloudTask} from "../cloud/taskCloudService.ts";
+import {localDb, type Task, TaskStatus} from "../../storage/indexedDb/dexieConfig.ts";
+import {logTaskCreated, logTaskDeleted, logTaskStatusToggled} from "../../storage/firebase/analyticsService.ts";
 
-export const createTask = async (
-    taskData: Partial<Task>
-): Promise<void> => {
-    const isNewTask = !taskData.id;
+export const taskService = {
 
-    const task: Task = {
-        id: taskData.id || crypto.randomUUID(),
-        title: taskData.title!,
-        description: taskData.description!,
-        status: taskData.status || 'pending',
-        userId: taskData.userId!,
-        synced: false,
-        updated_at: new Date().toISOString(),
-    };
+    async createTask(task: Omit<Task, 'id' | 'synced' | 'created_at' | 'updated_at'>) {
+        const newTask: Task = {
+            ...task,
+            id: crypto.randomUUID(),
+            synced: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+        await localDb.tasks.add(newTask);
+        logTaskCreated(task.status);
+        return newTask;
+    },
 
-    if (isNewTask) {
-        await localDb.tasks.add(task);
-        logTaskCreated();
-    } else {
-        await localDb.tasks.put(task);
-        logTaskUpdated(task.id);
-    }
+    async toggleTaskStatus(taskId: string, currentStatus: TaskStatus): Promise<void> {
+        const newStatus = currentStatus === TaskStatus.COMPLETED
+        ? TaskStatus.PENDING : TaskStatus.COMPLETED;
 
-    try {
-        await upsertCloudTask(task);
+        await localDb.tasks.update(taskId, {
+            status: newStatus,
+            synced: false,
+            updated_at: new Date().toISOString(),
+        });
+        logTaskStatusToggled(newStatus);
+    },
 
-        await localDb.tasks.update(task.id, {synced: true});
-    } catch (error) {
-        console.log("Sem internet. O service worker sincroniza depois");
+    async softDelete(taskId: string): Promise<void> {
+        await localDb.tasks.update(taskId, {
+            status: TaskStatus.DELETED,
+            synced: false,
+            updated_at: new Date().toISOString(),
+        });
+        logTaskDeleted();
+    },
+
+    async getTaskById(taskId: string): Promise<Task | undefined> {
+        return await localDb.tasks.get(taskId);
+    },
+
+    async gelAllActiveTasks(userId: string): Promise<Task[]> {
+        return await localDb.tasks
+            .where('userId')
+            .equals(userId)
+            .filter(task => task.status !== TaskStatus.DELETED)
+            .reverse()
+            .sortBy('created_at');
     }
 };
-
-export const updateTaskStatus = async (
-    id: string, status: 'pending' | 'completed' | 'deleted'
-): Promise<void> => {
-    await localDb.tasks.update(id, {status});
-}
-
-export const deleteTask = async (id: string, status: 'deleted'): Promise<void> => {
-    await localDb.tasks.update(id, {status});
-}
