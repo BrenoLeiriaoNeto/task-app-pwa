@@ -19,6 +19,10 @@ export const logTaskCreated = (taskStatus: TaskStatus) => {
     });
 };
 
+export const logTaskUpdated = () => {
+    trackEvent("task_updated");
+};
+
 export const logTaskStatusToggled = (newStatus: TaskStatus) => {
     trackEvent("task_status_toggled", {
         new_status: newStatus,

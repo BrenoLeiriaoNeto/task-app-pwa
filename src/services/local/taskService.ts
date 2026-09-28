@@ -1,5 +1,10 @@
 import {localDb, type Task, TaskStatus} from "../../storage/indexedDb/dexieConfig.ts";
-import {logTaskCreated, logTaskDeleted, logTaskStatusToggled} from "../../storage/firebase/analyticsService.ts";
+import {
+    logTaskCreated,
+    logTaskDeleted,
+    logTaskStatusToggled,
+    logTaskUpdated
+} from "../../storage/firebase/analyticsService.ts";
 
 export const taskService = {
 
@@ -26,6 +31,17 @@ export const taskService = {
             updated_at: new Date().toISOString(),
         });
         logTaskStatusToggled(newStatus);
+    },
+
+    async updateTask(taskId: string, updates: {
+        title: string, description?: string
+    }): Promise<void> {
+        await localDb.tasks.update(taskId, {
+            ...updates,
+            synced: false,
+            updated_at: new Date().toISOString(),
+        });
+        logTaskUpdated();
     },
 
     async softDelete(taskId: string): Promise<void> {
