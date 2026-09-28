@@ -5,6 +5,7 @@ import {useState} from "react";
 import {taskService} from "../services/local/taskService.ts";
 import {TaskStatus} from "../storage/indexedDb/dexieConfig.ts";
 import {TaskForm} from "../components/TaskForm.tsx";
+import {ThemeToggle} from "../components/ThemeToggle.tsx";
 
 interface TasksPageProps {
   userId: string;
@@ -72,6 +73,7 @@ export default function TasksPage({ userId }: TasksPageProps) {
             right={
               <div className="flex items-center mr-2">
                   <NetworkStatusBadge userId={userId} />
+                  <ThemeToggle />
               </div>
             }
           />
