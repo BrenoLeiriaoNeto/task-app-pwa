@@ -1,4 +1,4 @@
-import {Block, Checkbox, Fab, List, ListItem, Navbar, Page} from "konsta/react";
+import {Block, Checkbox, Fab, Link, List, ListItem, Navbar, Page} from "konsta/react";
 import {NetworkStatusBadge} from "../components/NetworkStatusBadge";
 import {useLiveQuery} from "dexie-react-hooks";
 import {useState} from "react";
@@ -6,6 +6,7 @@ import {taskService} from "../services/local/taskService.ts";
 import {TaskStatus} from "../storage/indexedDb/dexieConfig.ts";
 import {TaskForm} from "../components/TaskForm.tsx";
 import {ThemeToggle} from "../components/ThemeToggle.tsx";
+import {logoutCloudUser} from "../services/cloud/authCloudService.ts";
 
 interface TasksPageProps {
   userId: string;
@@ -70,6 +71,14 @@ export default function TasksPage({ userId }: TasksPageProps) {
       <Page>
           <Navbar
             title="Minhas Tarefas"
+            left={
+              <Link
+                  onClick={() => logoutCloudUser()}
+                  className="text-red-500 font-medium"
+              >
+                  Sair
+              </Link>
+            }
             right={
               <div className="flex items-center mr-2">
                   <NetworkStatusBadge userId={userId} />

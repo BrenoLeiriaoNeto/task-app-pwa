@@ -1,9 +1,11 @@
 import {
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    signOut
 } from 'firebase/auth';
 import {auth} from "../../storage/firebase/firebaseConfig.ts";
 import {logNewUserRegistered, logUserLogin} from "../../storage/firebase/analyticsService.ts";
+import {localDb} from "../../storage/indexedDb/dexieConfig.ts";
 
 export const registerCloudUser = async (
     email: string,
@@ -27,3 +29,16 @@ export const loginCloudUser = async (
     logUserLogin(user.uid);
     return user;
 };
+
+export const logoutCloudUser = async () => {
+    try {
+        await signOut(auth);
+
+        localStorage.removeItem('pwa_userId');
+
+        await localDb.tasks.clear();
+
+    } catch (error) {
+        console.error('[Auth] Erro durante o logout:', error);
+    }
+}
