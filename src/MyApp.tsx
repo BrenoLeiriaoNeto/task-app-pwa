@@ -8,6 +8,7 @@ import {useTheme} from "./hooks/useTheme.ts";
 import { onAuthStateChanged } from "firebase/auth";
 import {auth} from "./storage/firebase/firebaseConfig.ts";
 import TasksPage from "./pages/TasksPage.tsx";
+import {ReloadPrompt} from "./components/ReloadPrompt.tsx";
 
 
 function MyApp() {
@@ -39,6 +40,7 @@ function MyApp() {
           )}
               <PWAInstallBanner />
               {userId ? <TasksPage userId={userId} /> : <LoginPage />}
+              <ReloadPrompt />
           </App>
     )
 }

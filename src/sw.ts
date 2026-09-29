@@ -1,3 +1,4 @@
+/// <reference types="vite-plugin-pwa/client" />
 /// <reference lib="webworker" />
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 import { initializeApp } from 'firebase/app';
