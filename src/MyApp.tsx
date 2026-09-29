@@ -19,7 +19,7 @@ function MyApp() {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                authLocalService.saverUserId(user.uid);
+                authLocalService.saveUserId(user.uid);
                 if (userId !== user.uid) setUserId(user.uid);
             } else {
                 authLocalService.clearUserId();

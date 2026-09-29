@@ -1,12 +1,36 @@
 <!doctype html>
-<html lang="en" class="dark k-dark">
+<html lang="pt-BR" class="dark k-dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#364153" />
+    <meta name="theme-color" content="#18181b" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>task-app-pwa-26e3-3</title>
+    <meta name="apple-mobile-web-app-title" content="TaskApp"/>
+    <link rel="apple-touch-icon" href="/Logo-light-512px.png" />
+
+    <script>
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (!isStandalone) {
+          const canvas = document.createElement('canvas');
+          canvas.width = window.screen.width * window.devicePixelRatio;
+          canvas.height = window.screen.height * window.devicePixelRatio;
+
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#18181b';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const link = document.createElement('link');
+          link.rel = 'apple-touch-startup-image';
+          link.href = canvas.toDataURL('image/png');
+          document.head.appendChild(link);
+        }
+      }
+    </script>
+
+    <title>TaskApp</title>
   </head>
   <body class="bg-gray-700 text-white">
     <div id="root"></div>

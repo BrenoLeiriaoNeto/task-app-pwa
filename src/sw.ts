@@ -1,10 +1,10 @@
 /// <reference types="vite-plugin-pwa/client" />
 /// <reference lib="webworker" />
-import { cleanupOutdatedCaches, precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
-import { NavigationRoute, registerRoute } from 'workbox-routing';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import { localDb } from "./storage/indexedDb/dexieConfig.ts";
+import {cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute} from 'workbox-precaching';
+import {NavigationRoute, registerRoute} from 'workbox-routing';
+import {initializeApp} from 'firebase/app';
+import {doc, getFirestore, setDoc} from 'firebase/firestore';
+import {localDb, TaskStatus} from "./storage/indexedDb/dexieConfig.ts";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -51,7 +51,12 @@ async function syncTasksWithFirestore(): Promise<void> {
 
             await setDoc(doc(firestore, "tasks", task.id), cloudTaskData, {merge: true});
 
-            await localDb.tasks.update(task.id, { synced: true });
+            if (task.status === TaskStatus.DELETED) {
+                await localDb.tasks.delete(task.id);
+            } else {
+                await localDb.tasks.update(task.id, { synced: true });
+            }
+
         }
     } catch (error) {
         console.error('[SW background Sync falhou]:', error);

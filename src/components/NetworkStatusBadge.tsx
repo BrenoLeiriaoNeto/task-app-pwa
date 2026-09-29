@@ -45,8 +45,19 @@ export function NetworkStatusBadge({ userId }: NetworkStatusBadgeProps) {
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"/>
           <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
         </span>
-        <span>Online</span>
+        <span>Offline</span>
       </Badge>
     )
+  } else {
+      return (
+        <Badge className="bg-emerald-500 text-white font-medium flex items-center
+          gap-1.5 px-2.5 py-1 rounded-full text-xs">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"/>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+          </span>
+          <span>Online</span>
+        </Badge>
+      )
   }
 }

@@ -11,7 +11,7 @@ export function PWAInstallBanner() {
                 <Block className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-700 p-4 m-0 flex flex-col gap-3">
                     <div className="flex items-center gap-3">
                         <img
-                            src="/Logo-light-512x512.png"
+                            src="/Logo-light-512px.png"
                             alt="Task App Logo"
                             className="w-12 h-12 rounded-xl border border-zinc-100 dark:border-zinc-700"
                         />

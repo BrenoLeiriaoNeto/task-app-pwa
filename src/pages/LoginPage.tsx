@@ -1,12 +1,7 @@
 import { Page, Block } from 'konsta/react';
 import LoginForm from '../components/LoginForm.tsx';
-import type { User } from '../storage/indexedDb/dexieConfig.ts';
 
-interface LoginPageProps {
-  onLoginSuccess?: (user: User) => void;
-}
-
-export const LoginPage = ({ onLoginSuccess }: LoginPageProps) => {
+export const LoginPage = () => {
   return (
     <Page className="bg-neutral-900 text-white min-h-screen flex flex-col justify-center">
       <div className="w-full max-w-sm mx-auto px-4 py-8 flex flex-col justify-center">
@@ -29,9 +24,8 @@ export const LoginPage = ({ onLoginSuccess }: LoginPageProps) => {
           </p>
         </div>
 
-        {/* Login Form */}
         <Block className="px-0! py-0! my-0!">
-          <LoginForm onSuccess={onLoginSuccess} />
+          <LoginForm/>
         </Block>
       </div>
     </Page>

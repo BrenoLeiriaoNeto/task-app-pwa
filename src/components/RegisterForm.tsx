@@ -26,7 +26,7 @@ export function RegisterForm() {
         try {
             const user = await registerCloudUser(email, password);
 
-            authLocalService.saverUserId(user.uid);
+            authLocalService.saveUserId(user.uid);
 
         } catch (err: any) {
             console.error(err);

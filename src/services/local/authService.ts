@@ -1,5 +1,5 @@
 export const authLocalService = {
-    saverUserId: (userId: string) => {
+    saveUserId: (userId: string) => {
         localStorage.setItem('pwa_userId', userId);
     },
     getUserId: (): string | null => {

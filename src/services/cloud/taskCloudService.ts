@@ -22,7 +22,7 @@ export const taskCloudService = {
                 id: doc.id,
                 title: data.title,
                 description: data.description,
-                status: data.staus || TaskStatus.PENDING,
+                status: data.status || TaskStatus.PENDING,
                 userId: data.userId,
                 created_at: data.created_at,
                 updated_at: data.updated_at,

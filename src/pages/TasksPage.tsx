@@ -21,7 +21,7 @@ export default function TasksPage({ userId }: TasksPageProps) {
     } | null>(null);
 
     const tasks = useLiveQuery(
-        () => taskService.gelAllActiveTasks(userId), [userId]);
+        () => taskService.getAllActiveTasks(userId), [userId]);
 
     const handleToggleCompleted = async (taskId: string, currentStatus: TaskStatus) => {
         await taskService.toggleTaskStatus(taskId, currentStatus);

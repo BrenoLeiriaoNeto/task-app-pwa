@@ -57,7 +57,7 @@ export const taskService = {
         return await localDb.tasks.get(taskId);
     },
 
-    async gelAllActiveTasks(userId: string): Promise<Task[]> {
+    async getAllActiveTasks(userId: string): Promise<Task[]> {
         return await localDb.tasks
             .where('userId')
             .equals(userId)

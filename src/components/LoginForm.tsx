@@ -26,7 +26,7 @@ export function LoginForm() {
       try {
           const user = await loginCloudUser(email, password);
 
-          authLocalService.saverUserId(user.uid);
+          authLocalService.saveUserId(user.uid);
 
       } catch (err: any) {
           console.error(err);
