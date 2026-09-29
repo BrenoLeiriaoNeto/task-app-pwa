@@ -89,7 +89,7 @@ export default function TasksPage({ userId }: TasksPageProps) {
 
           {!tasks || tasks.length === 0 ? (
               <Block className="text-center mt-12 text-zinc-500 dark:text-zinc-400">
-                  <p className="text-lg font-medium mb-1">Tudo limpor por aqui</p>
+                  <p className="text-lg font-medium mb-1">Tudo limpo por aqui</p>
                   <p className="text-sm">Toque no botão abaixo para criar uma tarefa.</p>
               </Block>
           ) : (

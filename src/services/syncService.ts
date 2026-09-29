@@ -1,4 +1,4 @@
-import {localDb} from "../storage/indexedDb/dexieConfig.ts";
+import {localDb, TaskStatus} from "../storage/indexedDb/dexieConfig.ts";
 import {taskCloudService} from "./cloud/taskCloudService.ts";
 import {logTasksPullSynced, logTasksPushSynced} from "../storage/firebase/analyticsService.ts";
 
@@ -12,7 +12,12 @@ export const pushSyncToFirestore = async (): Promise<void> => {
     for (const task of pendingTasks) {
         try {
             await taskCloudService.pushTaskToCloud(task);
-            await localDb.tasks.update(task.id, {synced: true});
+
+            if (task.status === TaskStatus.DELETED) {
+                await localDb.tasks.delete(task.id);
+            } else {
+                await localDb.tasks.update(task.id, {synced: true});
+            }
         } catch (error) {
             console.error(`Falha ao realizar o Push Sync da tarefa ${task.id}:`, error);
         }

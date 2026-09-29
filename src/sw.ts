@@ -1,6 +1,7 @@
 /// <reference types="vite-plugin-pwa/client" />
 /// <reference lib="webworker" />
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import { cleanupOutdatedCaches, precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
+import { NavigationRoute, registerRoute } from 'workbox-routing';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { localDb } from "./storage/indexedDb/dexieConfig.ts";
@@ -14,6 +15,17 @@ interface SyncEvent extends ExtendableEvent {
 
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
+
+try {
+    const handler = createHandlerBoundToURL("/index.html");
+    const navigationRoute = new NavigationRoute(handler, {
+        allowlist: [/^\/$/ , /^\/[a-zA-Z0-9_-]+/],
+        denylist: [/^\/api\//, /firebase/],
+    });
+    registerRoute(navigationRoute);
+} catch (error) {
+    console.warn('[SW] Fallback de navegação não pôde ser registrado.', error);
+}
 
 const firebaseConfig = {
     apiKey: "AIzaSyAaHbMb-buqa48fwqJmjr18QegYAp31O4c",
