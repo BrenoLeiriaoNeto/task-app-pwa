@@ -6,7 +6,6 @@ import {
     logTaskUpdated
 } from "../../storage/firebase/analyticsService.ts";
 import {pushSyncToFirestore} from "../syncService.ts";
-import {triggerBackgroundSync} from "../../utils/syncUtils.ts";
 
 export const taskService = {
 
