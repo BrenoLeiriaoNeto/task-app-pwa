@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Block, Button, Link, List, ListInput, Navbar, Page, Sheet} from "konsta/react";
+import {Block, Button, Link, List, ListInput, Sheet, Toolbar} from "konsta/react";
 
 interface TaskFormData {
     id?: string;
@@ -47,20 +47,21 @@ export function TaskForm({opened, onClose, initialData, onSubmit}: TaskFormProps
             opened={opened}
             onBackdropClick={onClose}
         >
-            <Page>
-                <Navbar
-                    title={initialData ? "Editar tarefa" : "Nova tarefa"}
-                    right={
-                        <Link
-                            onClick={onClose}
-                            className="text-emerald-600 font-medium"
-                        >
-                            Fechar
-                        </Link>
-                    }
-                />
+            <Toolbar top className="z-50">
+                <div className="left font-semibold text-lg px-4">
+                    {initialData ? "Editar tarefa" : "Nova tarefa"}
+                </div>
+                <div className="right">
+                    <Link
+                        onClick={onClose}
+                        className="text-emerald-600 font-medium"
+                    >
+                        Fechar
+                    </Link>
+                </div>
+            </Toolbar>
 
-                <List className="mt-4">
+                <List className="my-2">
                     <ListInput
                         label="Título"
                         type="text"
@@ -92,7 +93,6 @@ export function TaskForm({opened, onClose, initialData, onSubmit}: TaskFormProps
                         Salvar tarefa
                     </Button>
                 </Block>
-            </Page>
         </Sheet>
     )
 }

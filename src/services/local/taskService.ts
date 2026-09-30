@@ -5,6 +5,8 @@ import {
     logTaskStatusToggled,
     logTaskUpdated
 } from "../../storage/firebase/analyticsService.ts";
+import {pushSyncToFirestore} from "../syncService.ts";
+import {triggerBackgroundSync} from "../../utils/syncUtils.ts";
 
 export const taskService = {
 
@@ -17,6 +19,11 @@ export const taskService = {
             updated_at: new Date().toISOString(),
         };
         await localDb.tasks.add(newTask);
+        if (navigator.onLine) {
+            await pushSyncToFirestore();
+        } else {
+            await triggerBackgroundSync();
+        }
         logTaskCreated(task.status);
         return newTask;
     },
@@ -41,6 +48,11 @@ export const taskService = {
             synced: false,
             updated_at: new Date().toISOString(),
         });
+        if (navigator.onLine) {
+            await pushSyncToFirestore();
+        } else {
+            await triggerBackgroundSync();
+        }
         logTaskUpdated();
     },
 

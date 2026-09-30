@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useState} from "react";
-import {triggerBackgroundSync} from "../utils/syncUtils.ts";
-import {pullSyncFromFirestore} from "../services/syncService.ts";
+import {pullSyncFromFirestore, pushSyncToFirestore} from "../services/syncService.ts";
 
 export function useNetworkSync(userId?: string) {
   const [isOnline, setIsOnline] = useState<boolean>(
@@ -14,7 +13,7 @@ export function useNetworkSync(userId?: string) {
     setIsSyncing(true);
 
     try {
-      await triggerBackgroundSync();
+      await pushSyncToFirestore();
 
       if (userId) {
         await pullSyncFromFirestore(userId);

@@ -4,11 +4,17 @@ export async function triggerBackgroundSync() {
     try {
         const registration = await navigator.serviceWorker.ready;
 
-         if ('sync' in registration) {
-            await (registration as any).sync.register('sync-tasks');
-            console.log('🔄 Sincronização em background registrada via API nativa.');
+        if ('sync' in registration) {
+            try {
+                await (registration as any).sync.register('sync-tasks');
+                console.log('🔄 Sincronização em background registrada via API nativa.');
+                return;
+            } catch (syncError) {
+                console.warn('⚠️ Background Sync nativo não permitido. Usando fallback postMessage.', syncError);
+            }
+        }
 
-        } else if (registration.active) {
+        if (registration.active) {
             registration.active.postMessage({ type: 'SYNC_TASKS' });
             console.log('🔄 Sincronização disparada via postMessage (Fallback).');
         }

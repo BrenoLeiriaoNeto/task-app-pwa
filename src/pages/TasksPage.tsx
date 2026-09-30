@@ -115,12 +115,17 @@ export default function TasksPage({ userId }: TasksPageProps) {
                           </div>
                         }
                         after={
-                          !task.synced && (
+                          !task.synced ?  (
                                 <span className="text-2xs bg-amber-100 text-amber-700
                                 px-1.5 pt-0.5 rounded-sm shrink-0">
                                     Pendente
                                 </span>
-                            )
+                            ) : (
+                              <span className="text-2xs bg-emerald-100 text-emerald-700
+                                px-1.5 pt-0.5 rounded-sm shrink-0">
+                                    Sincronizada
+                                </span>
+                          )
                         }
                       />
                   ))}
@@ -128,7 +133,7 @@ export default function TasksPage({ userId }: TasksPageProps) {
           )}
 
           <Fab
-            className="fixed right-4 bottom-4 md:right-8 md:bottom-8 z-50 bg-emerald-600"
+            className="fixed right-4 bottom-4 md:right-8 md:bottom-8 z-40 bg-emerald-600"
             onClick={openNewTaskForm}
           >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
