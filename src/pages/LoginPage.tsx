@@ -1,7 +1,15 @@
-import { Page, Block } from 'konsta/react';
+import {Page, Block, Link} from 'konsta/react';
 import LoginForm from '../components/LoginForm.tsx';
+import {useState} from "react";
+import RegisterForm from "../components/RegisterForm.tsx";
 
 export const LoginPage = () => {
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+
+  const toggleTab = () => {
+    setActiveTab((prev) => (prev === 'login' ? 'register' : 'login'));
+  };
+
   return (
     <Page className="bg-neutral-900 text-white min-h-screen flex flex-col justify-center">
       <div className="w-full max-w-sm mx-auto px-4 py-8 flex flex-col justify-center">
@@ -17,15 +25,27 @@ export const LoginPage = () => {
             />
           </div>
           <h1 className="philosopher-bold text-3xl font-bold tracking-tight text-white mb-1">
-            Bem-vindo(a)
+            {activeTab === 'login' ? 'Bem-vindo(a)' : 'Crie sua conta'}
           </h1>
           <p className="text-sm text-neutral-400 font-normal">
-            Sign in to continue to your workspace
+            {activeTab === 'login' ?
+            'Entre para acessar suas tarefas' : 'Preencha seus dados para começar'}
           </p>
         </div>
 
         <Block className="px-0! py-0! my-0!">
-          <LoginForm/>
+          {activeTab === 'login' ? <LoginForm/> : <RegisterForm/>}
+        </Block>
+
+        <Block className="text-center mt-6">
+          <Link
+              onClick={toggleTab}
+              className="text-emerald-500 font-medium text-sm cursor-pointer hover:text-emerald-400 transition-colors"
+          >
+            {activeTab === 'login'
+                ? 'Não possui uma conta? Cadastre-se!'
+                : 'Já possui uma conta? Faça login!'}
+          </Link>
         </Block>
       </div>
     </Page>

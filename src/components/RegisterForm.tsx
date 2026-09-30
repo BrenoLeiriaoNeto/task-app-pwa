@@ -30,7 +30,7 @@ export function RegisterForm() {
 
         } catch (err: any) {
             console.error(err);
-            setError('Credenciais inválidas ou erro de rede.');
+            setError('Erro ao criar conta. Verifique seus dados ou conexão.');
         } finally {
             setIsLoading(false);
         }
@@ -63,7 +63,7 @@ export function RegisterForm() {
 
             <Block className="mt-4">
                 <Button onClick={handleRegister} className="bg-emerald-600" disabled={isLoading}>
-                    {isLoading ? 'Entrando...' : 'Entrar'}
+                    {isLoading ? 'Cadastrando...' : 'Cadastrar'}
                 </Button>
             </Block>
         </>
