@@ -71,15 +71,22 @@ self.addEventListener('sync', (event: Event) => {
 });
 
 self.addEventListener('message', (event: ExtendableMessageEvent) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+
     if (event.data && event.data.type === 'SYNC_TASKS') {
         event.waitUntil(syncTasksWithFirestore());
     }
 });
 
+/*
+Descomente apenas para instalar novas versões automaticamente
+
 self.addEventListener('install', () => {
   self.skipWaiting();
 });
-
+*/
 self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(self.clients.claim());
 });

@@ -19,11 +19,8 @@ export const taskService = {
             updated_at: new Date().toISOString(),
         };
         await localDb.tasks.add(newTask);
-        if (navigator.onLine) {
-            await pushSyncToFirestore();
-        } else {
-            await triggerBackgroundSync();
-        }
+        if (navigator.onLine) await pushSyncToFirestore();
+
         logTaskCreated(task.status);
         return newTask;
     },
@@ -37,6 +34,9 @@ export const taskService = {
             synced: false,
             updated_at: new Date().toISOString(),
         });
+
+        if (navigator.onLine) await pushSyncToFirestore();
+
         logTaskStatusToggled(newStatus);
     },
 
@@ -48,11 +48,8 @@ export const taskService = {
             synced: false,
             updated_at: new Date().toISOString(),
         });
-        if (navigator.onLine) {
-            await pushSyncToFirestore();
-        } else {
-            await triggerBackgroundSync();
-        }
+        if (navigator.onLine) await pushSyncToFirestore();
+
         logTaskUpdated();
     },
 
@@ -62,6 +59,9 @@ export const taskService = {
             synced: false,
             updated_at: new Date().toISOString(),
         });
+
+        if (navigator.onLine) await pushSyncToFirestore();
+
         logTaskDeleted();
     },
 
