@@ -40,7 +40,7 @@ export const taskService = {
     },
 
     async updateTask(taskId: string, updates: {
-        title: string, description?: string
+        title: string; description?: string; dueDate?: string;
     }): Promise<void> {
         await localDb.tasks.update(taskId, {
             ...updates,

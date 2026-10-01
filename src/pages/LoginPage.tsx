@@ -1,9 +1,13 @@
-import {Page, Block, Link} from 'konsta/react';
+import {Page, Block, Link, Button} from 'konsta/react';
 import LoginForm from '../components/LoginForm.tsx';
 import {useState} from "react";
 import RegisterForm from "../components/RegisterForm.tsx";
 
-export const LoginPage = () => {
+interface LoginPageProps {
+  onOpenQuestionnaire: () => void;
+}
+
+export const LoginPage = ({ onOpenQuestionnaire }: LoginPageProps) => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
   const toggleTab = () => {
@@ -46,6 +50,13 @@ export const LoginPage = () => {
                 ? 'Não possui uma conta? Cadastre-se!'
                 : 'Já possui uma conta? Faça login!'}
           </Link>
+          <Button
+              outline
+              onClick={onOpenQuestionnaire}
+              className="mt-4 border-emerald-500 text-emerald-500"
+          >
+            Questionário
+          </Button>
         </Block>
       </div>
     </Page>

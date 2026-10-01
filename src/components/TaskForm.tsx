@@ -5,24 +5,27 @@ interface TaskFormData {
     id?: string;
     title: string;
     description: string;
+    dueDate?: string;
 }
 
 interface TaskFormProps {
     opened: boolean;
     onClose: () => void;
     initialData?: TaskFormData | null;
-    onSubmit: (data: { title: string; description: string; id?: string }) => void;
+    onSubmit: (data: { title: string; description: string; dueDate?: string; id?: string }) => void;
 }
 
 export function TaskForm({opened, onClose, initialData, onSubmit}: TaskFormProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [dueDate, setDueDate] = useState('');
     const [error, setError] = useState('');
 
     useEffect(() => {
         if (opened) {
             setTitle(initialData?.title || '');
             setDescription(initialData?.description || '');
+            setDueDate(initialData?.dueDate || '');
             setError('');
         }
     }, [opened, initialData]);
@@ -36,6 +39,7 @@ export function TaskForm({opened, onClose, initialData, onSubmit}: TaskFormProps
         onSubmit({
             title: title.trim(),
             description: description.trim(),
+            dueDate: dueDate || undefined,
             id: initialData?.id
         });
         onClose();
@@ -71,6 +75,13 @@ export function TaskForm({opened, onClose, initialData, onSubmit}: TaskFormProps
                             setTitle(e.target.value);
                             if (error) setError('');
                         }}
+                    />
+                    <ListInput
+                        label="Data/Horário"
+                        type="datetime-local"
+                        placeholder="Selecione data e horário"
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
                     />
                     <ListInput
                         label="Descrição"
