@@ -6,13 +6,13 @@ import {taskService} from "../services/local/taskService.ts";
 import {type Task, TaskStatus} from "../storage/indexedDb/dexieConfig.ts";
 import {TaskForm} from "../components/TaskForm.tsx";
 import {ThemeToggle} from "../components/ThemeToggle.tsx";
-import {logoutCloudUser} from "../services/cloud/authCloudService.ts";
 
 interface TasksPageProps {
   userId: string;
+  onOpenProfile: () => void;
 }
 
-export default function TasksPage({ userId }: TasksPageProps) {
+export default function TasksPage({ userId, onOpenProfile }: TasksPageProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [taskToEdit, setTaskToEdit] = useState<{
         id: string;
@@ -110,27 +110,29 @@ export default function TasksPage({ userId }: TasksPageProps) {
     };
 
   return (
-      <Page>
+      <Page className="relative">
           <Navbar
             title="Minhas Tarefas"
             left={
               <Link
-                  onClick={() => logoutCloudUser()}
-                  className="text-red-500 font-medium"
+                  onClick={onOpenProfile}
+                  className="text-emerald-600 dark:text-emerald-400 font-medium cursor-pointer"
               >
-                  Sair
+                  Perfil
               </Link>
             }
             right={
-              <div className="flex items-center mr-2">
-                  <NetworkStatusBadge userId={userId} />
+              <div>
                   <ThemeToggle />
               </div>
             }
           />
 
-          {/* Segmento de levantamento de tarefas feitas do dia */}
-          <div className="mx-4 mt-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
+          <div className="flex items-center justify-end mx-4 mt-3 mb-1">
+              <NetworkStatusBadge userId={userId} />
+          </div>
+
+          <div className="mx-4 mt-2 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
               <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                       <span className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
@@ -182,7 +184,6 @@ export default function TasksPage({ userId }: TasksPageProps) {
               )}
           </div>
 
-          {/* Divider horizontal separando da listagem de tarefas */}
           <div className="my-4 mx-4 border-t border-zinc-200 dark:border-zinc-800" />
 
           {!tasks || tasks.length === 0 ? (
@@ -195,10 +196,16 @@ export default function TasksPage({ userId }: TasksPageProps) {
                   {tasks.map((task) => (
                       <ListItem
                         key={task.id}
+                        className={`cursor-pointer transition-all duration-150 border-l-[3px] ${
+                            task.status === TaskStatus.COMPLETED
+                                ? 'opacity-60 hover:opacity-90 border-l-transparent bg-zinc-50/50 dark:bg-zinc-900/30'
+                                : 'opacity-100 border-l-emerald-500 dark:border-l-emerald-400'
+                        }`}
                         title={
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 philosopher-regular">
                                 <span className={task.status === TaskStatus.COMPLETED
-                                    ? 'line-through text-zinc-400' : ''}>
+                                    ? 'line-through text-zinc-400 dark:text-zinc-500'
+                                    : 'font-medium text-zinc-900 dark:text-zinc-100'}>
                                     {task.title}
                                 </span>
                                 <button
@@ -219,7 +226,11 @@ export default function TasksPage({ userId }: TasksPageProps) {
                         }
                         subtitle={
                             task.dueDate ? (
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1 mt-0.5">
+                                <span className={`text-xs flex items-center gap-1 mt-0.5 ${
+                                    task.status === TaskStatus.COMPLETED
+                                        ? 'text-zinc-400 dark:text-zinc-500 line-through'
+                                        : 'text-zinc-500 dark:text-zinc-400'
+                                }`}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                     </svg>
@@ -227,9 +238,15 @@ export default function TasksPage({ userId }: TasksPageProps) {
                                 </span>
                             ) : undefined
                         }
-                        text={task.description}
+                        text={task.description ? (
+                            <span className={task.status === TaskStatus.COMPLETED
+                            ? 'text-zinc-400 dark:text-zinc-500 text-xs'
+                            : 'text-zinc-600 dark:text-zinc-300 text-xs'
+                            }>
+                                {task.description}
+                            </span>
+                        ) : undefined}
                         onClick={() => openEditTaskForm(task)}
-                        className="cursor-pointer"
                         media={
                           <div onClick={(e) => e.stopPropagation()}>
                               <Checkbox
@@ -239,17 +256,13 @@ export default function TasksPage({ userId }: TasksPageProps) {
                           </div>
                         }
                         after={
-                          !task.synced ?  (
-                                <span className="text-2xs bg-amber-100 text-amber-700
-                                px-1.5 pt-0.5 rounded-sm shrink-0">
-                                    Não sincronizada
-                                </span>
-                            ) : (
-                              <span className="text-2xs bg-emerald-100 text-emerald-700
-                                px-1.5 pt-0.5 rounded-sm shrink-0">
-                                    Sincronizada
-                                </span>
-                          )
+                            <span className={`text-2xs px-1.5 pt-0.5 rounded-sm shrink-0 ${
+                                !task.synced
+                                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
+                                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                            }`}>
+                                {!task.synced ? 'Não sincronizada' : 'Sincronizada'}
+                            </span>
                         }
                       />
                   ))}

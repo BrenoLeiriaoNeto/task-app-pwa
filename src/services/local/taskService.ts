@@ -75,5 +75,12 @@ export const taskService = {
             .filter(task => task.status !== TaskStatus.DELETED)
             .reverse()
             .sortBy('created_at');
+    },
+
+    async getAllTasks(userId: string): Promise<Task[]> {
+        return await localDb.tasks
+            .where('userId')
+            .equals(userId)
+            .toArray();
     }
 };

@@ -8,6 +8,7 @@ import {useTheme} from "./hooks/useTheme.ts";
 import { onAuthStateChanged } from "firebase/auth";
 import {auth} from "./storage/firebase/firebaseConfig.ts";
 import TasksPage from "./pages/TasksPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
 import {ReloadPrompt} from "./components/ReloadPrompt.tsx";
 import QuestionnairePage from "./pages/QuestionnairePage.tsx";
 
@@ -15,8 +16,7 @@ import QuestionnairePage from "./pages/QuestionnairePage.tsx";
 function MyApp() {
     const [userId, setUserId] = useState<string | null>(authLocalService.getUserId());
     const [showQuestionnaire, setShowQuestionnaire] = useState(false);
-
-    useTheme();
+    const [showProfile, setShowProfile] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -26,6 +26,7 @@ function MyApp() {
             } else {
                 authLocalService.clearUserId();
                 setUserId(null);
+                setShowProfile(false);
             }
         });
 
@@ -33,19 +34,25 @@ function MyApp() {
     }, [userId]);
 
     const {isOnline} = useNetworkSync();
+    const {isDark} = useTheme();
+
     return (
-          <App safeAreas theme="ios" className="k-ios" dark>
+          <App safeAreas theme="ios" className="k-ios min-h-screen flex flex-col" dark={isDark}>
               {!isOnline && (
-                  <div className="bg-red-500 text-white text-xs text-center py-1 absolute top-0 w-full z-50">
+                  <div className="bg-red-500 text-white text-xs font-medium text-center py-1.5 px-4 w-full shrink-0 z-50 shadow-xs">
                       Você está offline. Alterações serão salvas localmente.
                   </div>
-          )}
+              )}
               <PWAInstallBanner />
               {showQuestionnaire ? (
                   <QuestionnairePage onBack={() => setShowQuestionnaire(false)} />
-              ) : userId
-                  ? <TasksPage userId={userId} />
-                  : <LoginPage onOpenQuestionnaire={() => setShowQuestionnaire(true)} />}
+              ) : !userId ? (
+                  <LoginPage onOpenQuestionnaire={() => setShowQuestionnaire(true)} />
+              ) : showProfile ? (
+                  <ProfilePage userId={userId} onBack={() => setShowProfile(false)} />
+              ) : (
+                  <TasksPage userId={userId} onOpenProfile={() => setShowProfile(true)} />
+              )}
               <ReloadPrompt />
           </App>
     )
