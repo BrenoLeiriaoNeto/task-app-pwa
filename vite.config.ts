@@ -6,19 +6,43 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), VitePWA({
-    registerType: 'autoUpdate',
+    strategies: 'injectManifest',
+    srcDir: 'src',
+    filename: 'sw.ts',
+    registerType: 'prompt',
+    injectRegister: 'auto',
     manifest: {
+      id: '/',
       name: 'Task App PWA',
       short_name: 'TaskApp',
       description: 'A simple task app with PWA capabilities',
-
-      theme_color: '#364153',
-      background_color: '#364153',
+      start_url: '/',
+      scope: '/',
+      theme_color: '#10b981',
+      background_color: '#18181b',
 
       display: 'standalone',
       orientation: 'portrait',
-      scope: '/',
-      start_url: '/'
+      icons: [
+        {
+          src: '/Logo-dark-192px.png',
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any'
+        },
+        {
+          src: '/Logo-dark-512px.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any'
+        },
+        {
+          src: '/Logo-dark-512px.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable'
+        }
+      ]
     }
   })],
 })
